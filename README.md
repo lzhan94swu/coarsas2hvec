@@ -13,13 +13,3 @@ Source code for paper "CoarSAS2hvec: improve the quality of sampling to advance 
 ## Basic Usage 
 
 python main.py
- 
-> publisher = {ACM},
-
-> address = {Anchorage, Alaska, USA},
-
-> year = {2019},
-
-> keywords = {Heterogeneous Information Network, Network Embedding, Generative Adversarial Network},
- 
-}
