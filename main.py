@@ -10,9 +10,9 @@ import tqdm
 from numpy import random
 from six import iteritems
 
-# import tensorflow as tf
+import tensorflow as tf
 
-# from gensim.models.keyedvectors import Vocab
+from gensim.models.keyedvectors import Vocab
 
 from utils import *
 from coarsen import *
@@ -59,9 +59,9 @@ def parse_args():
     return parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-# config = tf.ConfigProto()
-# config.gpu_options.allow_growth = True
-# session = tf.Session(config=config)
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.Session(config=config)
 
 def get_batches(pairs, batch_size, vocab, node_types):
     n_batches = (len(pairs) + (batch_size - 1)) // batch_size
@@ -237,14 +237,6 @@ if __name__ == "__main__":
         node_pairs.append(tmp_pairs)
         context += tmp_context
         sampled_times += 1
-        # break
-    
-    import tensorflow as tf
-
-    from gensim.models.keyedvectors import Vocab
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
 
     np.random.seed(0)
     graph = tf.Graph()
