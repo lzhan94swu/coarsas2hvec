@@ -22,10 +22,10 @@ class SNSampler():
             self.Ori_typed_Graph = self.build_typed_Graph(Ori_Graph)
         self.degree_prob = {}
         self.import_prob = {}
-        if len(self.context) == 0:
-            self.build_degree_prob()
-        else:
-            self.build_import_prob()
+        # if len(self.context) == 0:
+        self.build_degree_prob()
+        # else:
+        self.build_import_prob()
 
     def build_typed_Graph(self, Graph):
         typed_Graph = {}
@@ -82,23 +82,14 @@ class SNSampler():
         node_pairs = []
         sampled_nodes = list(Graph.nodes())
         ori_nodes = Ori_candis
-        if len(self.import_prob) == 0:
-            for node in sampled_nodes:
+        # if len(self.import_prob) == 0:
+        for node in sampled_nodes:
+            self.context.append(node)
+            for _ in range(self.degree_prob[node]):
+                node_pairs += self.het_sampled_walk(node)
+        for node in ori_nodes:
                 self.context.append(node)
                 for _ in range(self.degree_prob[node]):
-                    node_pairs += self.het_sampled_walk(node)
-            for node in ori_nodes:
-                    self.context.append(node)
-                    for _ in range(self.degree_prob[node]):
-                        node_pairs += self.het_walk(node)
-        else:
-            for node in sampled_nodes:
-                self.context.append(node)
-                for _ in range(self.import_prob[node]):
-                    node_pairs += self.het_sampled_walk(node)
-            for node in ori_nodes:
-                self.context.append(node)
-                for _ in range(self.import_prob[node]):
                     node_pairs += self.het_walk(node)
         context = self.context
         return node_pairs, context
@@ -108,35 +99,19 @@ class SNSampler():
         node_pairs = []
         ori_nodes = Ori_candis
         if self.type_neighbor == None:
-            if len(self.import_prob) == 0:
-                for node in nodes:
-                    self.context.append(node)
-                    for _ in range(self.degree_prob[node]):
-                        node_pairs += self.walk(node)
-            else:
-                for node in nodes:
-                    self.context.append(node)
-                    for _ in range(self.import_prob[node]):
-                        node_pairs += self.walk(node)
+            for node in nodes:
+                self.context.append(node)
+                for _ in range(self.degree_prob[node]):
+                    node_pairs += self.walk(node)
         else:
-            if len(self.import_prob) == 0:
-                for node in nodes:
-                    self.context.append(node)
-                    for _ in range(self.degree_prob[node]):
-                        node_pairs += self.het_sampled_walk(node)
-                for node in ori_nodes:
-                    self.context.append(node)
-                    for _ in range(self.degree_prob[node]):
-                        node_pairs += self.het_walk(node)
-            else:
-                for node in nodes:
-                    self.context.append(node)
-                    for _ in range(self.import_prob[node]):
-                        node_pairs += self.het_sampled_walk(node)
-                for node in ori_nodes:
-                    self.context.append(node)
-                    for _ in range(self.import_prob[node]):
-                        node_pairs += self.het_walk(node)
+            for node in nodes:
+                self.context.append(node)
+                for _ in range(self.degree_prob[node]):
+                    node_pairs += self.het_sampled_walk(node)
+            for node in ori_nodes:
+                self.context.append(node)
+                for _ in range(self.degree_prob[node]):
+                    node_pairs += self.het_walk(node)
         context = self.context
         gc.collect()
         return node_pairs, context

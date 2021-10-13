@@ -10,7 +10,7 @@ import tqdm
 from numpy import random
 from six import iteritems
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from gensim.models.keyedvectors import Vocab
 
@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--epoch', type=int, default=30,
                         help='Number of epoch. Default is 50.')
 
-    parser.add_argument('--batch-size', type=int, default=256,
+    parser.add_argument('--batch-size', type=int, default=512,
                         help='Number of batch_size. Default is 512.')
 
     parser.add_argument('--dimensions', type=int, default=128,
@@ -44,16 +44,16 @@ def parse_args():
     parser.add_argument('--window-size', type=int, default=5,
                         help='Context size for optimization. Default is 5.')
 
-    parser.add_argument('--negative-samples', type=int, default=10,
+    parser.add_argument('--negative-samples', type=int, default=5,
                         help='Negative samples for optimization. Default is 5.')
 
-    parser.add_argument('--coarsen-rate', default=0.2,
+    parser.add_argument('--coarsen-rate', default=0.3,
                         help='Proportion of the removed nodes in coarsening. Default is 0.3')
 
     parser.add_argument('--coarsen-times', default=3,
                         help='Rounds of coarsen. Default is 3')
 
-    parser.add_argument('--center-type', default='p',
+    parser.add_argument('--center-type', default=None,
                         help='Fixed type of sampling')
 
     return parser.parse_args()
@@ -121,7 +121,10 @@ if __name__ == "__main__":
 
     num_nodes = len(all_nodes)
 
-    center_type = type_vocabs[args.center_type]
+    if args.center_type != None:
+        center_type = type_vocabs[args.center_type]
+    else:
+        center_type = args.center_type
     type_walk_nums = None
     Ori_Graph = nx.Graph()
     Ori_Graph.add_edges_from(training_data)
@@ -147,13 +150,12 @@ if __name__ == "__main__":
     candidates = []
     context = []
     for t in range(coar_round):
-        round_sample_times = round_sample_times * (0.5 ** t)
+        round_sample_times = int(round_sample_times * (0.5 ** (t)))
         if round_sample_times >= 1:
             sub_sample_times = round_sample_times
         else:
             sub_sample_times = 1
         for j in range(sub_sample_times):
-        # for i in range(1):
             if sampled_times <= walk_length:
                 print('Start sampling {} times'.format(sampled_times))
                 Sns = SNSampler(Ori_Graph=Ori_Graph,
@@ -237,6 +239,7 @@ if __name__ == "__main__":
         node_pairs.append(tmp_pairs)
         context += tmp_context
         sampled_times += 1
+        # break
 
     np.random.seed(0)
     graph = tf.Graph()
